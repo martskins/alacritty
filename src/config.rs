@@ -355,6 +355,10 @@ pub struct WindowConfig {
     /// Draw the window with title bar / borders
     #[serde(default)]
     decorations: Decorations,
+
+    /// Initialize in fullscreen mode
+    #[serde(default)]
+    fullscreen: bool,
 }
 
 fn default_padding() -> Delta<u8> {
@@ -377,6 +381,10 @@ impl WindowConfig {
     pub fn decorations(&self) -> Decorations {
         self.decorations
     }
+
+    pub fn fullscreen(&self) -> bool {
+        self.fullscreen
+    }
 }
 
 impl Default for WindowConfig {
@@ -385,6 +393,7 @@ impl Default for WindowConfig {
             dimensions: Default::default(),
             padding: default_padding(),
             decorations: Default::default(),
+            fullscreen: false,
         }
     }
 }
