@@ -151,6 +151,11 @@ impl<'a, N: Notify + 'a> input::ActionContext for ActionContext<'a, N> {
     fn hide_window(&mut self) {
         self.window_changes.hide = true;
     }
+
+    #[inline]
+    fn toggle_fullscreen(&mut self) {
+        self.window_changes.fullscreen = true;
+    }
 }
 
 /// The ActionContext can't really have direct access to the Window
@@ -159,6 +164,7 @@ impl<'a, N: Notify + 'a> input::ActionContext for ActionContext<'a, N> {
 /// the actual changes.
 pub struct WindowChanges {
     pub hide: bool,
+    pub fullscreen: bool,
 }
 
 impl WindowChanges {
@@ -171,6 +177,7 @@ impl Default for WindowChanges {
     fn default() -> WindowChanges {
         WindowChanges {
             hide: false,
+            fullscreen: false,
         }
     }
 }
