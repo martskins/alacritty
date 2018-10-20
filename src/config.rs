@@ -1454,39 +1454,28 @@ impl Config {
     /// 3. $HOME/.config/alacritty/alacritty.yml
     /// 4. $HOME/.alacritty.yml
     pub fn installed_config<'a>() -> Option<Cow<'a, Path>> {
-        // Try using XDG location by default
-        ::xdg::BaseDirectories::with_prefix("alacritty")
-            .ok()
-            .and_then(|xdg| xdg.find_config_file("alacritty.yml"))
-            .or_else(|| {
-                ::xdg::BaseDirectories::new().ok().and_then(|fallback| {
-                    fallback.find_config_file("alacritty.yml")
-                })
-            })
-            .or_else(|| {
-                if let Ok(home) = env::var("HOME") {
-                    // Fallback path: $HOME/.config/alacritty/alacritty.yml
-                    let fallback = PathBuf::from(&home).join(".config/alacritty/alacritty.yml");
-                    if fallback.exists() {
-                        return Some(fallback);
-                    }
-                    // Fallback path: $HOME/.alacritty.yml
-                    let fallback = PathBuf::from(&home).join(".alacritty.yml");
-                    if fallback.exists() {
-                        return Some(fallback);
-                    }
-                }
-                None
-            })
-            .map(|path| path.into())
+        use ::directories::BaseDirs;
+        let base_dirs = BaseDirs::new()?;
+        let path = base_dirs.config_dir().join("alacritty/alacritty.yml");
+        Some(path.into())
     }
 
     pub fn write_defaults() -> io::Result<Cow<'static, Path>> {
-        let path = ::xdg::BaseDirectories::with_prefix("alacritty")
-            .map_err(|err| io::Error::new(io::ErrorKind::NotFound, ::std::error::Error::description(&err)))
-            .and_then(|p| p.place_config_file("alacritty.yml"))?;
-        File::create(&path)?.write_all(DEFAULT_ALACRITTY_CONFIG.as_bytes())?;
-        Ok(path.into())
+        use ::directories::BaseDirs;
+        match BaseDirs::new() {
+            Some(dirs) => {
+                let home = dirs.home_dir();
+                let path = PathBuf::from(home);
+                Ok(path.into())
+            }
+            None => io::Error::new(io::ErrorKind:.NotFound, ::std::error:Error::description("not found"))
+        }
+
+        // let path = ::xdg::BaseDirectories::with_prefix("alacritty")
+        //     .map_err(|err| io::Error::new(io::ErrorKind::NotFound, ::std::error::Error::description(&err)))
+        //     .and_then(|p| p.place_config_file("alacritty.yml"))?;
+        // File::create(&path)?.write_all(DEFAULT_ALACRITTY_CONFIG.as_bytes())?;
+        // Ok(path.into())
     }
 
     /// Get list of colors
